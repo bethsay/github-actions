@@ -1,0 +1,71 @@
+You probably have a fine-grained Personal Access Token created at https://github.com/settings/personal-access-tokens.
+If you dont have a PAT, Generate a new one. Ensure a short expiry is set. Copy the token into your system.
+    #vim ~/.github_pat
+
+Permissions 1 : Contents (Read & Write)
+This allows you to clone, pull, and push code from any local git to github repos.
+If your repo is public, clone and pull is allowed without PAT, but push requires PAT with Contents permission
+If you already have an ssh key.pub uploaded into your Github account, PAT with Contents permission is just redundant.
+Before you can use PAT, you need gh-cli installed
+gh-cli package is available ubuntu.source, but it is often a couple versions behind the githubsource
+    #gh --version
+    #wget -O /etc/apt/keyrings/githubcli-archive-keyring.gpg https://cli.github.com/packages/githubcli-archive-keyring.gpg
+    #echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list
+    #apt update && apt install gh
+    #gh --version
+    #gh auth status
+    #gh auth login --with-token < ~/.github_pat
+        ->You could directly use your token using the flag "--with-token <github_pat>"
+        ->Skipping the "--with-token" flag allows for an interactive gh auth login process
+    #gh auth status
+    #gh auth setup-git
+        ->gh sets itself as the credential helper in ~/.gitconfig
+Now your github_pat would be used for clone, pull and push.
+
+Permission 2 : Workflows (Read and Write) + Actions (Read and Write)
+Github Actions(gha) are yaml scripts that perform automations via Github Runners
+Only yaml files present within ".github/workflows/" folder of your repo will be considered as gha.
+The Workflows permission allows you git push commits that contain ".github/workflows/*.{yaml,yml}" files
+Github Runners are temp VMs owned by github. A Runner exists only for the duration of the job it runs.
+The Actions permission allows us to manage workflows and workflow runs.
+    #cd <repo_clone>
+    #git switch main
+    #gh workflow list
+    #gh workflow view <workflow_id>
+    #gh workflow run <workflow_id>
+Only workflows that exists on main, ie, default branch, can be managed with "gh workflow" and "gh run" commands.
+Only workflows that exists on main, ie, default branch, can be triggered by workflow_dipatch via https://github.com/username/repository/actions/workflows/action-name.yml
+    #gh run list
+    #gh run watch <run_id>
+    #gh run view <run_id>
+    #gh run rerun <run_id>
+Workflows of any branch can run using any trigger, except for workflow_dipatch
+Workflows of any branch can be rerun if it is listed with a run_id
+
+Permission 3 : Variables (Read and Write) + Secrets (Read and Write)
+    #cd <repo_clone>
+    #gh secret list
+    #gh secret list -R <username/remote-repo>
+    #gh secret set <KEY> --body <value> -R <username/remote-repo>
+I had created an IAM account by performing "terraform apply" in 02-aws-iam folder of terraform repo
+    #cd terraform/02-aws-iam
+    #terraform apply -var-file temp.tfvars
+    #terraform output
+Output contains api_access and api_secret. I needed to use these as secrets of this repo, ie, github-actions
+    #terraform output -raw api_access
+    #gh secret set AWS_IAM_ACCESS_KEY -b "$(!-1)" -R bethsay/github-actions
+    #terraform output -raw api_secret
+    #gh secret set AWS_IAM_SECRET_KEY -b "$(!-1)" -r bethsay/github-actions
+    #cd github-actions
+    #gh secret list
+    #gh workflow list
+    #gh workflow run 'Create S3 Bucket'
+    #gh run list
+    #aws s3 ls
+Cleanup,
+    #cd github-actions
+    #aws s3 rb "s3://terraform-backend-58fd44e0"
+    #gh secret delete AWS_IAM_ACCESS_KEY
+    #gh secret delete AWS_IAM_SECRET_KEY
+    #cd terraform/02-aws-iam
+    #terraform destroy
