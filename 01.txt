@@ -42,13 +42,29 @@ Only workflows that exists on main, ie, default branch, can be triggered by work
 Workflows of any branch can run using any trigger, except for workflow_dipatch
 Workflows of any branch can be rerun if it is listed with a run_id
 
+Almost all sub-commands of gh accept the flag "-R <username/remote-repo>".
+This allows for running the sub-command when your pwd is not the clone of the remote-repo
+    #gh workflow list -R <username/remote-repo>
+    #gh run list -R bethsay/terraform
+
 Permission 3 : Variables (Read and Write) + Secrets (Read and Write)
     #cd <repo_clone>
     #gh secret list
-    #gh secret list -R <username/remote-repo>
     #gh secret set <KEY> --body <value> -R <username/remote-repo>
+    #gh variable list
+    #gh variable set <key> -b <value>
+    #gh variable get <key>
+If you have env-files (files that contains only key=values) that need to be imported as variables or secrets,
+    #gh secret set -f <filename>
+    #gh variable set -f .env
+If you have a file from which you can extract the keys = value lines and need to set them as variables or secrets,
+    #grep '=' .creds | gh secrets set -f -
+    #gh variable set -f(grep '=' .config)
+
 I had created an IAM account by performing "terraform apply" in 02-aws-iam folder of terraform repo
     #cd terraform/02-aws-iam
+    #vim temp.tf
+        ->user = "gha-temp", console_access = false, encryption_key = "", aws_policy_names = ["AmazonS3FullAccess"]
     #terraform apply -var-file temp.tfvars
     #terraform output
 Output contains api_access and api_secret. I needed to use these as secrets of this repo, ie, github-actions
@@ -61,6 +77,7 @@ Output contains api_access and api_secret. I needed to use these as secrets of t
     #gh workflow list
     #gh workflow run 'Create S3 Bucket'
     #gh run list
+    #gh run view <run_id>
     #aws s3 ls
 Cleanup,
     #cd github-actions
