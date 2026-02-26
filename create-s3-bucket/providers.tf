@@ -8,9 +8,9 @@ terraform {
 }
 
 provider "aws" {
-  # shared_credentials_files = ["~/.aws/credentials"]
-  # shared_config_files      = ["~/.aws/config"]
-  # profile                  = "default"
+  shared_credentials_files = var.provider_creds
+  shared_config_files      = var.provider_conf
+  profile                  = var.provider_profile
   default_tags {
     tags = {
       project = "training",
