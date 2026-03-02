@@ -1,16 +1,24 @@
-variable "provider_creds" {
+variable "path_aws_creds" {
   type    = list(string)
   default = null
 }
 
-variable "provider_conf" {
+variable "path_aws_conf" {
   type    = list(string)
   default = null
 }
 
-variable "provider_profile" {
+variable "profile_aws_conf" {
   type    = string
   default = null
+}
+
+variable "global_tags" {
+  type    = map(string)
+  default = {
+    project = "training"
+    env     = "dev"
+  }
 }
 
 variable "s3_prefix" {
