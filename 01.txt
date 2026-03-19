@@ -9,9 +9,12 @@ If you already have an ssh key.pub uploaded into your Github account, PAT with C
 Before you can use PAT, you need gh-cli installed
 gh-cli package is available ubuntu.source, but it is often a couple versions behind the githubsource
     #gh --version
-    #wget -O /etc/apt/keyrings/githubcli-archive-keyring.gpg https://cli.github.com/packages/githubcli-archive-keyring.gpg
-    #echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list
-    #apt update && apt install gh
+    #sudo wget -O /etc/apt/keyrings/githubcli-archive-keyring.gpg https://cli.github.com/packages/githubcli-archive-keyring.gpg
+    #echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list
+    #sudo apt update && sudo apt install gh
+Enable gh auto complete for across the system
+    #gh completion -s bash | sudo tee /etc/bash_completion.d/gh
+Close and Re-open current session
     #gh --version
     #gh auth status
     #gh auth login --with-token < ~/.github_pat
