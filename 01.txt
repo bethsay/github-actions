@@ -68,6 +68,15 @@ If you have a file from which you can extract the keys = value lines and need to
     #grep '=' .creds | gh secrets set -f -
     #gh variable set -f(grep '=' .config)
 
+Credit : https://mahendranp.medium.com/configure-github-openid-connect-oidc-provider-in-aws-b7af1bca97dd
+Instead of using accesskey and secret of an IAM user
+Configure Github as an OIDC provider : 
+https://docs.github.com/en/actions/how-tos/secure-your-work/security-harden-deployments/oidc-in-aws#adding-the-identity-provider-to-aws
+Create an IAM role "GithubActionConnector" using Web Identity type : 
+https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_oidc.html#idp_oidc_Create_GitHub
+https://github.com/aws-actions/configure-aws-credentials?tab=readme-ov-file#quick-start-oidc-recommended
+In your workflow update configure-aws-credentials action with role-to-assume: GithubActionConnector
+
 I had created an IAM account by performing "terraform apply" in 02-aws-iam folder of terraform repo
     #cd terraform/02-aws-iam
     #vim temp.tf
